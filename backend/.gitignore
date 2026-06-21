@@ -1,0 +1,20 @@
+# Environment variables
+.env
+
+# Large data files
+yellow_tripdata_2019-01.parquet
+yellow_tripdata_2019-01.csv
+excluded_records.csv
+
+# Node
+node_modules/
+npm-debug.log
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db
