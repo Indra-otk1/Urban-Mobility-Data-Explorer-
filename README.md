@@ -1,8 +1,38 @@
-# Urban Mobility Data Explorer — Backend
+# Urban Mobility Data Explorer
 
-Node.js / Express backend for the Urban Mobility Data Explorer, backed by MySQL.
-Cleans and loads the NYC TLC yellow taxi dataset, then serves it through a
-filterable, sortable REST API.
+Full-stack dashboard for exploring NYC taxi mobility patterns using TLC trip
+records, taxi zone lookup data, and taxi zone spatial metadata.
+
+## What’s included
+
+- Node.js / Express backend backed by MySQL.
+- Data cleaning, feature engineering, and exclusion logging.
+- Manual algorithm implementation for zone ranking.
+- HTML/CSS/JS frontend dashboard with charts and a trips table.
+
+## Raw data
+
+The raw TLC parquet files are not committed to the repository because they are
+large and are distributed separately by NYC TLC.
+
+Download the official data here:
+
+- NYC TLC Trip Record Data: https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
+- Taxi Zone Lookup Table: https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv
+- Taxi Zone Shapefile archive: https://d37ci6vzurychx.cloudfront.net/misc/taxi_zones.zip
+
+For this project you need these three inputs:
+
+- `yellow_tripdata_*.parquet` for the trip fact data.
+- `taxi_zone_lookup.csv` for the zone lookup dimension.
+- `taxi_zones.geojson` for the spatial zone metadata.
+
+The TLC trip record page publishes monthly parquet downloads and the official
+data dictionary / parquet guide. If you prefer to work from another month, use
+the same page and select the year/month you need.
+
+If you only have the shapefile archive, you can convert it to GeoJSON with the
+helper script already in the backend folder.
 
 ## Prerequisites
 
@@ -148,3 +178,17 @@ package.json
 `npm run ingest` truncates and reloads `zone`, `zone_boundary`, and `trip`
 each time it runs, so it's safe to re-run after fixing a bug in
 `clean.js` — you won't end up with duplicate rows.
+
+## Limitations
+
+- The borough filter in the frontend is currently client-side for the demo,
+  so it only applies to the rows already fetched for the table and charts.
+- The top-zones insight uses a 100k-row sample in Node so the live demo stays
+  responsive; it is not a full-table aggregation.
+- The dashboard is intended to run with a local backend at `localhost:4000`.
+- The project depends on the downloaded TLC parquet file being available in the
+  path configured in `.env`.
+- The current dataset pipeline is tuned for the TLC yellow taxi schema used in
+  this assignment; other TLC datasets would need validation and mapping updates.
+- The frontend currently emphasizes exploratory charts and filtering rather
+  than a production map experience.
