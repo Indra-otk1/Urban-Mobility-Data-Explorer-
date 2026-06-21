@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NYC Taxi Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">⬡ <span>NYC Taxi Explorer</span></div>
+
+    <div class="filters">
+      <p class="filter-label">FILTERS</p>
+      <label>Start Date<input type="date" id="f-start" /></label>
+      <label>End Date<input type="date" id="f-end" /></label>
+      <label>Borough
+        <select id="f-borough">
+          <option value="">All</option>
+          <option>Manhattan</option><option>Brooklyn</option>
+          <option>Queens</option><option>Bronx</option><option>Staten Island</option>
+        </select>
+      </label>
+      <label>Payment
+        <select id="f-payment">
+          <option value="">All</option>
+          <option value="1">Credit Card</option>
+          <option value="2">Cash</option>
+        </select>
+      </label>
+      <label>Min Distance<input type="number" id="f-dmin" placeholder="0" /></label>
+      <label>Max Distance<input type="number" id="f-dmax" placeholder="any" /></label>
+      <button id="btn-apply">Apply</button>
+      <button id="btn-reset" class="secondary">Reset</button>
+    </div>
+  </aside>
+
+  <main>
+    <header>
+      <h1>Urban Mobility Dashboard</h1>
+      <span id="last-updated"></span>
+    </header>
+
+    <!-- KPIs -->
+    <section class="kpis">
+      <div class="kpi"><div class="kpi-label">Total Trips</div><div class="kpi-val" id="k-trips">—</div></div>
+      <div class="kpi"><div class="kpi-label">Avg Fare</div><div class="kpi-val" id="k-fare">—</div></div>
+      <div class="kpi"><div class="kpi-label">Avg Distance</div><div class="kpi-val" id="k-dist">—</div></div>
+      <div class="kpi"><div class="kpi-label">Avg Duration</div><div class="kpi-val" id="k-dur">—</div></div>
+      <div class="kpi"><div class="kpi-label">Revenue/Mile</div><div class="kpi-val" id="k-rpm">—</div></div>
+    </section>
+
+    <!-- Charts -->
+    <section class="charts">
+      <div class="card wide">
+        <div class="card-head"><span>Trips by Hour</span>
+          <div>
+            <button class="tab active" data-mode="all">All</button>
+            <button class="tab" data-mode="weekday">Weekday</button>
+            <button class="tab" data-mode="weekend">Weekend</button>
+          </div>
+        </div>
+        <canvas id="c-hourly"></canvas>
+      </div>
+      <div class="card"><div class="card-head"><span>Fare Distribution</span></div><canvas id="c-fare"></canvas></div>
+      <div class="card"><div class="card-head"><span>Payment Split</span></div><canvas id="c-payment"></canvas></div>
+      <div class="card"><div class="card-head"><span>Top Pickup Zones</span></div><canvas id="c-zones"></canvas></div>
+      <div class="card"><div class="card-head"><span>Tip % by Borough</span></div><canvas id="c-tip"></canvas></div>
+    </section>
+
+    <!-- Table -->
+    <section class="table-section">
+      <div class="table-head">
+        <span>Recent Trips</span>
+        <div>
+          <input type="text" id="t-search" placeholder="Search zone…" />
+          <select id="t-sort">
+            <option value="tpep_pickup_datetime">Date</option>
+            <option value="total_amount">Fare</option>
+            <option value="trip_distance">Distance</option>
+          </select>
+          <button id="t-go">Go</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Pickup Time</th><th>Pickup Zone</th><th>Dropoff Zone</th>
+            <th>Distance</th><th>Duration</th><th>Fare</th><th>Tip</th><th>Total</th>
+          </tr></thead>
+          <tbody id="t-body"><tr><td colspan="8" class="empty">Apply filters to load trips.</td></tr></tbody>
+        </table>
+      </div>
+      <div id="pagination"></div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
