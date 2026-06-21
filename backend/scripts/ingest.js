@@ -138,54 +138,68 @@ async function flushExclusionBatch(batch) {
 }
 
 async function loadTrips(validZoneIds) {
-  console.log('--- Streaming and cleaning trip parquet data ---');
-  const reader = await parquet.ParquetReader.openFile(path.resolve(TRIP_PARQUET_PATH));
-  const cursor = reader.getCursor();
+  console.log('--- Streaming and cleaning trip CSV data ---');
 
   let rowIndex = 0;
   let acceptedCount = 0;
   let rejectedCount = 0;
-
   let tripBatch = [];
   let exclusionBatch = [];
 
-  let record = null;
-  while ((record = await cursor.next())) {
-    if (ROW_LIMIT && rowIndex >= ROW_LIMIT) break;
+  await new Promise((resolve, reject) => {
+    const stream = fs.createReadStream(path.resolve(TRIP_PARQUET_PATH))
+      .pipe(csv());
 
-    const result = cleanTrip(record, validZoneIds);
-    if (result.ok) {
-      tripBatch.push(result.trip);
-      acceptedCount++;
-    } else {
-      exclusionBatch.push({
-        source_row_ref: `row_${rowIndex}`,
-        reason: result.reason,
-        raw_data: record,
-      });
-      rejectedCount++;
-    }
+    stream.on('data', async (record) => {
+      if (ROW_LIMIT && rowIndex >= ROW_LIMIT) return;
 
-    if (tripBatch.length >= TRIP_BATCH_SIZE) {
-      await flushTripBatch(tripBatch);
-      tripBatch = [];
-    }
-    if (exclusionBatch.length >= EXCLUSION_BATCH_SIZE) {
-      await flushExclusionBatch(exclusionBatch);
-      exclusionBatch = [];
-    }
+      const result = cleanTrip(record, validZoneIds);
+      if (result.ok) {
+        tripBatch.push(result.trip);
+        acceptedCount++;
+      } else {
+        exclusionBatch.push({
+          source_row_ref: `row_${rowIndex}`,
+          reason: result.reason,
+          raw_data: record,
+        });
+        rejectedCount++;
+      }
 
-    rowIndex++;
-    if (rowIndex % 50000 === 0) {
-      console.log(`Processed ${rowIndex} rows... (accepted ${acceptedCount}, rejected ${rejectedCount})`);
-    }
-  }
+      rowIndex++;
 
-  // Flush remaining partial batches
-  await flushTripBatch(tripBatch);
-  await flushExclusionBatch(exclusionBatch);
+      if (rowIndex % 50000 === 0) {
+        console.log(`Processed ${rowIndex} rows... (accepted ${acceptedCount}, rejected ${rejectedCount})`);
+      }
 
-  await reader.close();
+      // Pause the stream and flush to DB every 1000 rows so batches
+      // never accumulate in memory beyond this size
+      if (tripBatch.length >= TRIP_BATCH_SIZE || exclusionBatch.length >= EXCLUSION_BATCH_SIZE) {
+        stream.pause();
+        try {
+          await flushTripBatch(tripBatch);
+          await flushExclusionBatch(exclusionBatch);
+          tripBatch = [];
+          exclusionBatch = [];
+        } catch (err) {
+          reject(err);
+        }
+        stream.resume();
+      }
+    });
+
+    stream.on('end', async () => {
+      try {
+        await flushTripBatch(tripBatch);
+        await flushExclusionBatch(exclusionBatch);
+        resolve();
+      } catch (err) {
+        reject(err);
+      }
+    });
+
+    stream.on('error', reject);
+  });
 
   console.log(`--- Done. Total rows: ${rowIndex}, accepted: ${acceptedCount}, rejected: ${rejectedCount} ---`);
 }

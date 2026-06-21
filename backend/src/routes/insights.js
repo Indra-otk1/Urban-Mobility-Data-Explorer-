@@ -32,7 +32,7 @@ router.get('/top-zones', async (req, res, next) => {
     // a pre-aggregated rollup table instead of recomputing on every
     // request).
     const [trips] = await pool.query(
-      `SELECT pickup_location_id, total_amount, trip_distance_mi, tip_percentage FROM trip`
+      `SELECT pickup_location_id, total_amount, trip_distance_mi, tip_percentage FROM trip LIMIT 100000`
     );
 
     const aggregates = aggregateTripsByZone(trips);

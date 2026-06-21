@@ -5,10 +5,10 @@
   "main": "src/server.js",
   "type": "commonjs",
   "scripts": {
-    "ingest": "node scripts/ingest.js",
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
-  },
+  "ingest": "node --max-old-space-size=4096 scripts/ingest.js",
+  "start": "node src/server.js",
+  "dev": "nodemon src/server.js"
+},
   "dependencies": {
     "express": "^4.19.2",
     "mysql2": "^3.10.0",

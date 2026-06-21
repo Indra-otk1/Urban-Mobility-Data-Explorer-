@@ -52,6 +52,11 @@ function cleanTrip(raw, validZoneIds) {
   if (isNaN(pickupTime.getTime()) || isNaN(dropoffTime.getTime())) {
     return { ok: false, reason: 'unparseable timestamp' };
   }
+  const pickupYear = pickupTime.getFullYear();
+
+  if (pickupYear < 2009 || pickupYear > 2024) {
+  return { ok: false, reason: `pickup year out of expected range (${pickupYear})` };
+}
 
   // --- 2. Logical/temporal integrity ---
   const durationMin = (dropoffTime.getTime() - pickupTime.getTime()) / 1000 / 60;
@@ -129,9 +134,10 @@ function cleanTrip(raw, validZoneIds) {
   // the TLC data (cash tips aren't reliably recorded), but we compute
   // it whenever fare_amount > 0 and let the frontend decide how to
   // slice by payment_type.
-  const tipPercentage = fareAmount > 0
-    ? round2((Number(raw.tip_amount) || 0) / fareAmount * 100)
-    : null;
+  // Feature 2: tip percentage
+const tipPercentage = fareAmount > 0
+  ? Math.min(9999.99, round2((Number(raw.tip_amount) || 0) / fareAmount * 100))
+  : null;
 
   // Feature 3: is_airport_trip. Tells us about airport-related travel
   // demand, a distinct economic/behavioral segment from ordinary
