@@ -8,7 +8,7 @@ const zonesRouter = require('./routes/zones');
 const insightsRouter = require('./routes/insights');
 
 const app = express();
-app.use(cors());
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
