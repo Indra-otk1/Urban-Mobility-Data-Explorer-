@@ -259,6 +259,9 @@ duplicate rows.
 
 ---
 
+## Video Walkthrough link
+https://www.youtube.com/watch?v=jznCP-yhbYU
+
 ## Known limitations
 
 - The borough filter in the frontend is applied client-side on the current
