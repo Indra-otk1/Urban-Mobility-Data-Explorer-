@@ -5,7 +5,7 @@ records, taxi zone lookup data, and taxi zone spatial metadata.
 
 ## Video Walkthrough
 
-[Link to video walkthrough]((https://www.youtube.com/watch?v=jznCP-yhbYU))
+[Link to video walkthrough]([https://www.youtube.com/watch?v=jznCP-yhbYU])
 
 ---
 
