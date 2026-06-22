@@ -5,7 +5,7 @@ records, taxi zone lookup data, and taxi zone spatial metadata.
 
 ## Video Walkthrough
 
-[Link to video walkthrough](YOUR_VIDEO_LINK_HERE)
+[Link to video walkthrough]((https://www.youtube.com/watch?v=jznCP-yhbYU))
 
 ---
 
@@ -258,9 +258,6 @@ so it is safe to re-run after fixing a bug — you will not end up with
 duplicate rows.
 
 ---
-
-## Video Walkthrough link
-https://www.youtube.com/watch?v=jznCP-yhbYU
 
 ## Known limitations
 
