@@ -241,8 +241,7 @@ frontend/
 docs/
 └── report.pdf                  -- technical documentation report
 
-db/
-└── dump.sql                    -- exported database dump
+
 ```
 
 ---

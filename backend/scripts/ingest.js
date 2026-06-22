@@ -14,11 +14,10 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const csv = require('csv-parser');
-const parquet = require('parquetjs-lite');
 const pool = require('../src/db');
 const { cleanTrip } = require('./clean');
 
-const TRIP_PARQUET_PATH = process.env.TRIP_PARQUET_PATH || './data/yellow_tripdata.parquet';
+const TRIP_CSV_PATH = process.env.TRIP_PARQUET_PATH || './data/yellow_tripdata.parquet';
 const ZONE_LOOKUP_CSV_PATH = process.env.ZONE_LOOKUP_CSV_PATH || './data/taxi_zone_lookup.csv';
 const ZONE_GEOJSON_PATH = process.env.ZONE_GEOJSON_PATH || './data/taxi_zones.geojson';
 const ROW_LIMIT = process.env.INGEST_ROW_LIMIT ? Number(process.env.INGEST_ROW_LIMIT) : null;
@@ -147,7 +146,7 @@ async function loadTrips(validZoneIds) {
   let exclusionBatch = [];
 
   await new Promise((resolve, reject) => {
-    const stream = fs.createReadStream(path.resolve(TRIP_PARQUET_PATH))
+    const stream = fs.createReadStream(path.resolve(TRIP_CSV_PATH))
       .pipe(csv());
 
     stream.on('data', async (record) => {
